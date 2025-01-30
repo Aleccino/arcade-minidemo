@@ -1,5 +1,5 @@
 """
-Sprite Collect Coins
+Sprite Collect
 
 Simple program to show basic sprite usage.
 
@@ -13,13 +13,15 @@ import random
 import arcade
 
 # --- Constants ---
+SPRITE_SCALING_PERSON = 0.25
 SPRITE_SCALING_PLAYER = 0.5
-SPRITE_SCALING_COIN = .25
-COIN_COUNT = 50
+SPRITE_SCALING_COIN = 0.25
+COIN_COUNT = 200
+PERSON_COUNT = 250
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Sprite Collect Coins Example"
+SCREEN_TITLE = "Sprite Collect Example"
 
 
 class MyGame(arcade.Window):
@@ -33,6 +35,7 @@ class MyGame(arcade.Window):
         # Variables that will hold sprite lists
         self.player_list = None
         self.coin_list = None
+        self.person_list = None
 
         # Set up the player info
         self.player_sprite = None
@@ -41,7 +44,7 @@ class MyGame(arcade.Window):
         # Don't show the mouse cursor
         self.set_mouse_visible(False)
 
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.BABY_BLUE)
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -49,13 +52,13 @@ class MyGame(arcade.Window):
         # Sprite lists
         self.player_list = arcade.SpriteList()
         self.coin_list = arcade.SpriteList()
-
+        self.person_list = arcade.SpriteList()
         # Score
         self.score = 0
 
         # Set up the player
         # Character image from kenney.nl
-        img = ":resources:images/animated_characters/female_person/femalePerson_idle.png"
+        img = ":resources:images/animated_characters/zombie/zombie_idle.png"
         self.player_sprite = arcade.Sprite(img, SPRITE_SCALING_PLAYER)
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = 50
@@ -66,7 +69,7 @@ class MyGame(arcade.Window):
 
             # Create the coin instance
             # Coin image from kenney.nl
-            coin = arcade.Sprite(":resources:images/items/coinGold.png",
+            coin = arcade.Sprite(":resources:images/animated_characters/female_person/femalePerson_idle.png",
                                  SPRITE_SCALING_COIN)
 
             # Position the coin
@@ -76,12 +79,27 @@ class MyGame(arcade.Window):
             # Add the coin to the lists
             self.coin_list.append(coin)
 
+        # Create the people
+        for i in range(PERSON_COUNT):
+            # Create the person instance
+            # Coin image from kenney.nl
+            person = arcade.Sprite(":resources:images/animated_characters/male_person/malePerson_idle.png",
+                                     SPRITE_SCALING_PERSON)
+
+            # Position the person
+            person.center_x = random.randrange(SCREEN_WIDTH)
+            person.center_y = random.randrange(SCREEN_HEIGHT)
+
+             # Add the coin to the lists
+            self.person_list.append(person)
+
+
     def on_draw(self):
         """ Draw everything """
         self.clear()
         self.coin_list.draw()
         self.player_list.draw()
-
+        self.person_list.draw()
         # Put the text on the screen.
         output = f"Score: {self.score}"
         arcade.draw_text(text=output, start_x=10, start_y=20,
@@ -100,10 +118,15 @@ class MyGame(arcade.Window):
         # Generate a list of all sprites that collided with the player.
         coins_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
                                                               self.coin_list)
-
+        person_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                              self.person_list)
         # Loop through each colliding sprite, remove it, and add to the score.
         for coin in coins_hit_list:
             coin.remove_from_sprite_lists()
+            self.score += 1
+
+        for person in person_hit_list:
+            person.remove_from_sprite_lists()
             self.score += 1
 
 
